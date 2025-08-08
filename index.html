@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>GameRig - PC da Gaming | Shop</title>
+  <title>GameRigMilano - PC da Gaming | Shop</title>
   <meta name="description" content="GameRig - computer da gaming assemblati e prebuilt. Scopri le nostre configurazioni per ogni budget: entry, mid, high-end e workstation per streaming."/>
   <link rel="icon" href="data:,">
   <style>
@@ -289,6 +289,16 @@
       // In produzione: invia ordine al server, integra gateway
       alert('Checkout demo: invia i dati al server per processare il pagamento.');
     });
+
+    // Chiudi carrello cliccando fuori
+document.addEventListener('click', (e) => {
+  // cartPanel è già definito nel codice originale
+  const isClickInside = cartPanel.contains(e.target) || e.target.id === 'openCart';
+  if (!isClickInside && cartPanel.classList.contains('open')) {
+    cartPanel.classList.remove('open');
+    cartPanel.setAttribute('aria-hidden', 'true');
+  }
+});
 
     // Inizializza
     renderProducts(products);
