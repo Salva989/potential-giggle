@@ -7,7 +7,6 @@
   <meta name="description" content="GameRig - computer da gaming assemblati e prebuilt. Scopri le nostre configurazioni per ogni budget: entry, mid, high-end e workstation per streaming."/>
   <link rel="icon" href="data:,">
   <style>
-    /* Semplice CSS responsivo per demo */
     :root{
       --accent:#0b84ff;
       --bg:#f6f8fb;
@@ -31,7 +30,6 @@
     .specs{color:var(--muted);font-size:13px}
     footer{padding:18px;text-align:center;color:var(--muted);margin-top:40px}
     .cart-btn{background:white;border:1px solid rgba(255,255,255,0.2);padding:8px 12px;border-radius:8px;cursor:pointer}
-    /* Cart sidebar */
     .cart-side{position:fixed;right:0;top:0;height:100%;width:360px;background:linear-gradient(#fff,#fbfdff);box-shadow:-18px 0 40px rgba(12,20,40,0.12);transform:translateX(110%);transition:transform .25s;z-index:60;padding:20px;overflow:auto}
     .cart-side.open{transform:translateX(0)}
     .cart-item{display:flex;gap:10px;align-items:center;padding:10px 0;border-bottom:1px dashed #eee}
@@ -39,6 +37,62 @@
     .small{font-size:13px;color:var(--muted)}
     .actions{display:flex;gap:8px;align-items:center}
     @media (max-width:700px){ .cart-side{width:100%} header{flex-direction:column;align-items:flex-start} }
+    /* ------------------ MODALE CSS ------------------- */
+    .modal {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+    .modal.active {
+      display: flex;
+    }
+    .modal-backdrop {
+      position: absolute;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(22,28,40,0.35);
+      z-index: 1;
+      cursor: pointer;
+    }
+    .modal-content {
+      position: relative;
+      z-index: 2;
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 8px 32px rgba(12,20,40,0.17);
+      max-width: 360px;
+      width: 95vw;
+      padding: 24px 18px 18px 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: modalIn .25s;
+    }
+    @keyframes modalIn { from { transform: scale(.92); opacity:0; } to { transform: scale(1); opacity:1; } }
+    .modal-close {
+      position: absolute;
+      right: 14px;
+      top: 12px;
+      font-size: 22px;
+      background: none;
+      border: none;
+      color: #222;
+      cursor: pointer;
+      z-index: 3;
+    }
+    .modal-img {
+      width: 100%;
+      max-width: 220px;
+      border-radius: 10px;
+      margin-bottom: 16px;
+      object-fit: cover;
+      background: #f7f9fd;
+      box-shadow: 0 2px 12px rgba(12,20,40,0.05);
+    }
+    .modal-body { width: 100%; text-align: center;}
+    .modal-body .price { font-size: 1.3em; margin: 10px 0;}
   </style>
 </head>
 <body>
@@ -88,6 +142,21 @@
       <p class="small" style="margin-top:10px">Nessun pagamento reale in questa demo. Integra gateway (Stripe/PayPal) lato server per produzioni.</p>
     </div>
   </aside>
+
+  <!-- MODALE DETTAGLI PRODOTTO -->
+  <div id="productModal" class="modal" aria-hidden="true">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <button class="modal-close" aria-label="Chiudi dettagli">×</button>
+      <div class="modal-body">
+        <img id="modalImage" src="" alt="" class="modal-img">
+        <h2 id="modalTitle"></h2>
+        <p id="modalDesc" class="small"></p>
+        <p id="modalPrice" class="price"></p>
+        <button id="modalAdd" class="btn">Aggiungi al carrello</button>
+      </div>
+    </div>
+  </div>
 
   <footer>
     <div class="container small">
@@ -261,13 +330,44 @@
       }));
     }
 
-    // Modal semplice per dettagli prodotto (alert fallback per demo)
-    function showDetails(id){
-      const p = products.find(x=>x.id===id);
-      if(!p) return;
-      const content = `${p.name}\n\n${p.desc}\nPrezzo: ${fmt(p.price)}\nCategorie: ${p.category}\nTag: ${p.tags.join(', ')}`;
-      alert(content);
+    // ------------------- MODALE DETTAGLI PRODOTTO --------------------
+    // Modale elementi
+    const modal = document.getElementById('productModal');
+    const modalImg = document.getElementById('modalImage');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalDesc = document.getElementById('modalDesc');
+    const modalPrice = document.getElementById('modalPrice');
+    const modalAdd = document.getElementById('modalAdd');
+
+    function showDetails(id) {
+      const p = products.find(x => x.id === id);
+      if (!p) return;
+      modalImg.src = p.image;
+      modalImg.alt = p.name;
+      modalTitle.textContent = p.name;
+      modalDesc.textContent = p.desc;
+      modalPrice.textContent = fmt(p.price);
+      modalAdd.setAttribute('data-id', p.id);
+      modal.classList.add('active');
+      modal.setAttribute('aria-hidden', 'false');
     }
+
+    // Chiudi modale
+    function closeModal() {
+      modal.classList.remove('active');
+      modal.setAttribute('aria-hidden', 'true');
+    }
+
+    // Eventi chiusura modale
+    document.querySelector('.modal-close').addEventListener('click', closeModal);
+    document.querySelector('.modal-backdrop').addEventListener('click', closeModal);
+
+    // Aggiungi da modale
+    modalAdd.addEventListener('click', e => {
+      const id = e.target.getAttribute('data-id');
+      addToCart(id, 1);
+      closeModal();
+    });
 
     // Event listeners
     document.addEventListener('click', (e)=>{
@@ -283,6 +383,17 @@
     const cartPanel = document.getElementById('cart');
     document.getElementById('openCart').addEventListener('click', ()=>{ cartPanel.classList.add('open'); cartPanel.setAttribute('aria-hidden','false')});
     document.getElementById('closeCart').addEventListener('click', ()=>{ cartPanel.classList.remove('open'); cartPanel.setAttribute('aria-hidden','true')});
+
+    // Chiudi carrello cliccando fuori
+    document.addEventListener('click', (e) => {
+      // cartPanel è già definito nel codice originale
+      const isClickInside = cartPanel.contains(e.target) || e.target.id === 'openCart';
+      if (!isClickInside && cartPanel.classList.contains('open')) {
+        cartPanel.classList.remove('open');
+        cartPanel.setAttribute('aria-hidden', 'true');
+      }
+    });
+
     // checkout demo
     document.getElementById('checkout').addEventListener('click', ()=> {
       if(Object.keys(cart).length === 0) return alert('Il carrello è vuoto.');
@@ -290,22 +401,11 @@
       alert('Checkout demo: invia i dati al server per processare il pagamento.');
     });
 
-    // Chiudi carrello cliccando fuori
-document.addEventListener('click', (e) => {
-  // cartPanel è già definito nel codice originale
-  const isClickInside = cartPanel.contains(e.target) || e.target.id === 'openCart';
-  if (!isClickInside && cartPanel.classList.contains('open')) {
-    cartPanel.classList.remove('open');
-    cartPanel.setAttribute('aria-hidden', 'true');
-  }
-});
-
     // Inizializza
     renderProducts(products);
     updateCartUI();
   </script>
 
-  <!-- JSON-LD per SEO (esempio organization + product snippets) -->
   <script type="application/ld+json">
   {
     "@context":"https://schema.org",
