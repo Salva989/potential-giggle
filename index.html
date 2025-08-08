@@ -93,6 +93,18 @@
     }
     .modal-body { width: 100%; text-align: center;}
     .modal-body .price { font-size: 1.3em; margin: 10px 0;}
+    /* ----------- Bottone AGGIUNGI migliorato ----------- */
+    .btn.added {
+      background: #15b31a;
+      color: #fff;
+      border-color: #15b31a;
+      animation: pulse .4s;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1);}
+      70% { transform: scale(1.09);}
+      100% { transform: scale(1);}
+    }
   </style>
 </head>
 <body>
@@ -371,7 +383,19 @@
 
     // Event listeners
     document.addEventListener('click', (e)=>{
-      if(e.target.matches('[data-id]')) addToCart(e.target.getAttribute('data-id'),1);
+      // Bottone "Aggiungi" con feedback visivo
+      if(e.target.matches('[data-id]')) {
+        addToCart(e.target.getAttribute('data-id'),1);
+        // FEEDBACK visivo migliorato
+        e.target.classList.add('added');
+        e.target.textContent = "Aggiunto!";
+        e.target.disabled = true;
+        setTimeout(() => {
+          e.target.classList.remove('added');
+          e.target.textContent = "Aggiungi";
+          e.target.disabled = false;
+        }, 1200);
+      }
       if(e.target.matches('[data-detail]')) showDetails(e.target.getAttribute('data-detail'));
     });
 
