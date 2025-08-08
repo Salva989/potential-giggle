@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gaming PC Store</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: #fff;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background: #1f1f1f;
+            padding: 20px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .products {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding: 20px;
+        }
+        .product {
+            background: #1e1e1e;
+            padding: 20px;
+            border-radius: 10px;
+            width: 300px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.5);
+        }
+        .product img {
+            width: 100%;
+            border-radius: 10px;
+        }
+        .product h2 {
+            font-size: 20px;
+        }
+        .product p {
+            font-size: 16px;
+            color: #ccc;
+        }
+        .price {
+            font-size: 22px;
+            margin: 10px 0;
+            color: #4CAF50;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+    <script src="https://js.stripe.com/v3/"></script>
+</head>
+<body>
+    <header>
+        🖥️ Gaming PC Store
+    </header>
+    <div class="products">
+        <div class="product">
+            <img src="https://via.placeholder.com/300x200.png?text=AMD+Ryzen+Budget+PC" alt="AMD PC">
+            <h2>AMD Ryzen 5 + RX 6600</h2>
+            <p>PC gaming economico con processore AMD Ryzen 5 5600 e scheda video RX 6600. Perfetto per il Full HD.</p>
+            <div class="price">€799</div>
+            <button onclick="checkout('price_amd')">Compra ora</button>
+        </div>
+        <div class="product">
+            <img src="https://via.placeholder.com/300x200.png?text=Intel+i5+Budget+PC" alt="Intel Budget PC">
+            <h2>Intel i5 + GTX 1660 Super</h2>
+            <p>PC gaming economico con processore Intel i5 12400F e GTX 1660 Super. Ottimo per il Full HD competitivo.</p>
+            <div class="price">€849</div>
+            <button onclick="checkout('price_intel_budget')">Compra ora</button>
+        </div>
+        <div class="product">
+            <img src="https://via.placeholder.com/300x200.png?text=Intel+i7+Mid+Range+PC" alt="Intel Mid Range PC">
+            <h2>Intel i7 + RTX 3060 Ti</h2>
+            <p>PC gaming di fascia media con Intel i7 12700F e RTX 3060 Ti. Prestazioni eccellenti in 1440p.</p>
+            <div class="price">€1399</div>
+            <button onclick="checkout('price_intel_mid')">Compra ora</button>
+        </div>
+    </div>
+
+    <script>
+        const stripe = Stripe('INSERISCI_LA_TUA_PUBLIC_KEY_STRIPE'); // Inserisci la tua chiave pubblica Stripe
+
+        function checkout(priceId) {
+            stripe.redirectToCheckout({
+                lineItems: [{ price: priceId, quantity: 1 }],
+                mode: 'payment',
+                successUrl: window.location.origin + '/success.html',
+                cancelUrl: window.location.origin + '/cancel.html'
+            }).then(function (result) {
+                if (result.error) {
+                    alert(result.error.message);
+                }
+            });
+        }
+    </script>
+</body>
+</html>
