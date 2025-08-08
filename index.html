@@ -1,123 +1,312 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gaming PC Store</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background-color: #0e0e0e;
-            color: #fff;
-            margin: 0;
-            padding: 0;
-        }
-        header {
-            background: linear-gradient(90deg, #1a1a1a, #2a2a2a);
-            padding: 20px;
-            font-size: 28px;
-            font-weight: bold;
-            text-align: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.6);
-        }
-        .products {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 30px;
-            padding: 40px;
-            max-width: 1200px;
-            margin: auto;
-        }
-        .product {
-            background: #1b1b1b;
-            padding: 20px;
-            border-radius: 12px;
-            text-align: center;
-            box-shadow: 0px 4px 15px rgba(0,0,0,0.5);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        .product:hover {
-            transform: translateY(-5px);
-            box-shadow: 0px 8px 20px rgba(0,0,0,0.7);
-        }
-        .product img {
-            width: 100%;
-            border-radius: 8px;
-            margin-bottom: 15px;
-        }
-        .product h2 {
-            font-size: 20px;
-            margin: 10px 0;
-        }
-        .product p {
-            font-size: 15px;
-            color: #ccc;
-            line-height: 1.4;
-            min-height: 50px;
-        }
-        .price {
-            font-size: 24px;
-            margin: 15px 0;
-            color: #4CAF50;
-            font-weight: bold;
-        }
-        button {
-            background: linear-gradient(90deg, #4CAF50, #45a049);
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            cursor: pointer;
-            border-radius: 6px;
-            font-size: 16px;
-            transition: background 0.3s ease;
-        }
-        button:hover {
-            background: linear-gradient(90deg, #45a049, #3e8e41);
-        }
-    </style>
-    <script src="https://js.stripe.com/v3/"></script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>GameRig - PC da Gaming | Shop</title>
+  <meta name="description" content="GameRig - computer da gaming assemblati e prebuilt. Scopri le nostre configurazioni per ogni budget: entry, mid, high-end e workstation per streaming."/>
+  <link rel="icon" href="data:,">
+  <style>
+    /* Semplice CSS responsivo per demo */
+    :root{
+      --accent:#0b84ff;
+      --bg:#f6f8fb;
+      --card:#ffffff;
+      --muted:#6b7280;
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:#111}
+    header{background:linear-gradient(90deg,var(--accent),#5be);color:white;padding:18px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+    .brand{font-weight:700;font-size:20px;display:flex;align-items:center;gap:10px}
+    .container{max-width:1100px;margin:20px auto;padding:0 16px}
+    .controls{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
+    .search, .select, .btn {padding:10px;border-radius:8px;border:1px solid #e6e9ef;background:white}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+    .card{background:var(--card);border-radius:12px;padding:12px;border:1px solid #e7e9ef;display:flex;flex-direction:column;gap:8px}
+    .thumb{height:160px;border-radius:8px;background:#eaeef8;display:flex;align-items:center;justify-content:center;overflow:hidden}
+    .thumb img{width:100%;height:100%;object-fit:cover}
+    .title{font-weight:600}
+    .price{color:var(--accent);font-weight:700}
+    .specs{color:var(--muted);font-size:13px}
+    footer{padding:18px;text-align:center;color:var(--muted);margin-top:40px}
+    .cart-btn{background:white;border:1px solid rgba(255,255,255,0.2);padding:8px 12px;border-radius:8px;cursor:pointer}
+    /* Cart sidebar */
+    .cart-side{position:fixed;right:0;top:0;height:100%;width:360px;background:linear-gradient(#fff,#fbfdff);box-shadow:-18px 0 40px rgba(12,20,40,0.12);transform:translateX(110%);transition:transform .25s;z-index:60;padding:20px;overflow:auto}
+    .cart-side.open{transform:translateX(0)}
+    .cart-item{display:flex;gap:10px;align-items:center;padding:10px 0;border-bottom:1px dashed #eee}
+    .qty{display:flex;gap:6px;align-items:center}
+    .small{font-size:13px;color:var(--muted)}
+    .actions{display:flex;gap:8px;align-items:center}
+    @media (max-width:700px){ .cart-side{width:100%} header{flex-direction:column;align-items:flex-start} }
+  </style>
 </head>
 <body>
-    <header>🖥️ Gaming PC Store</header>
-    <div class="products">
-        <div class="product">
-            <img src="https://via.placeholder.com/300x200.png?text=AMD+Ryzen+Budget+PC" alt="AMD PC">
-            <h2>AMD Ryzen 5 + RX 6600</h2>
-            <p>PC gaming economico con processore AMD Ryzen 5 5600 e scheda video RX 6600. Perfetto per il Full HD.</p>
-            <div class="price">€799</div>
-            <button onclick="checkout('price_amd')">Compra ora</button>
-        </div>
-        <div class="product">
-            <img src="https://via.placeholder.com/300x200.png?text=Intel+i5+Budget+PC" alt="Intel Budget PC">
-            <h2>Intel i5 + GTX 1660 Super</h2>
-            <p>PC gaming economico con Intel i5 12400F e GTX 1660 Super. Ottimo per il Full HD competitivo.</p>
-            <div class="price">€849</div>
-            <button onclick="checkout('price_intel_budget')">Compra ora</button>
-        </div>
-        <div class="product">
-            <img src="https://via.placeholder.com/300x200.png?text=Intel+i7+Mid+Range+PC" alt="Intel Mid Range PC">
-            <h2>Intel i7 + RTX 3060 Ti</h2>
-            <p>PC gaming di fascia media con Intel i7 12700F e RTX 3060 Ti. Prestazioni eccellenti in 1440p.</p>
-            <div class="price">€1399</div>
-            <button onclick="checkout('price_intel_mid')">Compra ora</button>
-        </div>
+  <header>
+    <div class="brand">🎮 GameRig <span style="font-weight:400;font-size:13px;margin-left:6px;opacity:.9">PC da gaming &amp; accessori</span></div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <button id="openCart" class="cart-btn" aria-label="Apri carrello">Carrello (<span id="cartCount">0</span>)</button>
+      <a href="#catalog" style="color:white;background:rgba(255,255,255,0.12);padding:10px 12px;border-radius:8px;text-decoration:none">Catalogo</a>
     </div>
+  </header>
 
-    <script>
-        const stripe = Stripe('INSERISCI_LA_TUA_PUBLIC_KEY_STRIPE');
+  <main class="container" id="catalog">
+    <section class="controls" aria-label="Filtri di ricerca">
+      <input id="search" class="search" type="search" placeholder="Cerca modello, CPU, GPU..." aria-label="Cerca prodotti">
+      <select id="category" class="select" aria-label="Seleziona categoria">
+        <option value="all">Tutte le categorie</option>
+        <option value="prebuilt">Prebuilt</option>
+        <option value="custom">Assemblati</option>
+        <option value="workstation">Workstation</option>
+      </select>
+      <select id="sort" class="select" aria-label="Ordina per">
+        <option value="featured">In primo piano</option>
+        <option value="price-asc">Prezzo: basso → alto</option>
+        <option value="price-desc">Prezzo: alto → basso</option>
+      </select>
+      <div style="margin-left:auto" class="small">Spedizione standard in 3-5 giorni lavorativi</div>
+    </section>
 
-        function checkout(priceId) {
-            stripe.redirectToCheckout({
-                lineItems: [{ price: priceId, quantity: 1 }],
-                mode: 'payment',
-                successUrl: window.location.origin + '/success.html',
-                cancelUrl: window.location.origin + '/cancel.html'
-            }).then(function (result) {
-                if (result.error) {
-                    alert(result.error.message);
-                }
-            });
-        }
-    </script>
+    <section id="products" class="grid" aria-live="polite">
+      <!-- Cards generate with JS -->
+    </section>
+  </main>
+
+  <!-- Carrello laterale -->
+  <aside id="cart" class="cart-side" aria-label="Carrello acquisti" aria-hidden="true">
+    <h3>Il tuo carrello</h3>
+    <div id="cartItems" role="list"></div>
+    <div style="margin-top:16px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <strong>Totale</strong>
+        <strong id="cartTotal">€0.00</strong>
+      </div>
+      <div style="margin-top:12px;display:flex;gap:8px">
+        <button id="checkout" class="btn" style="flex:1">Vai al checkout</button>
+        <button id="closeCart" class="btn" style="flex:1;background:#f3f6fb">Chiudi</button>
+      </div>
+      <p class="small" style="margin-top:10px">Nessun pagamento reale in questa demo. Integra gateway (Stripe/PayPal) lato server per produzioni.</p>
+    </div>
+  </aside>
+
+  <footer>
+    <div class="container small">
+      © <strong>GameRig</strong> — Prodotto demo. Contatti: info@gamerig.example
+    </div>
+  </footer>
+
+  <script>
+    // Esempio di data prodotti (modifica come vuoi)
+    const products = [
+      {
+        id: "gr-aurora-rtx4080",
+        name: "Aurora X1 - RTX 4080",
+        category: "prebuilt",
+        price: 2899.00,
+        image: "https://via.placeholder.com/600x400?text=Aurora+X1",
+        desc: "Intel i9-13900K | 32GB DDR5 | RTX 4080 | 1TB NVMe",
+        tags: ["high-end","ray-tracing"]
+      },
+      {
+        id: "gr-storm-ryz7",
+        name: "Storm R7 - Ryzen 7",
+        category: "custom",
+        price: 1499.00,
+        image: "https://via.placeholder.com/600x400?text=Storm+R7",
+        desc: "AMD Ryzen 7 7800X3D | 16GB DDR5 | RTX 4070 | 1TB SSD",
+        tags: ["mid-range","value"]
+      },
+      {
+        id: "gr-entry-gtx",
+        name: "Nebula E - GTX 1660Ti",
+        category: "prebuilt",
+        price: 699.00,
+        image: "https://via.placeholder.com/600x400?text=Nebula+E",
+        desc: "Intel i5 | 8GB DDR4 | GTX 1660Ti | 512GB SSD",
+        tags: ["entry"]
+      },
+      {
+        id: "gr-prostream-7950x",
+        name: "ProStream - Threadripper Lite",
+        category: "workstation",
+        price: 3999.00,
+        image: "https://via.placeholder.com/600x400?text=ProStream",
+        desc: "AMD 7950X | 64GB DDR5 | RTX 4090 | Storage 2TB NVMe",
+        tags: ["streaming","workstation"]
+      }
+    ];
+
+    // Stato carrello
+    const cart = {};
+
+    // Utility
+    const fmt = v => v.toLocaleString('it-IT',{style:'currency',currency:'EUR'});
+
+    // Render prodotti nel catalogo
+    function renderProducts(list) {
+      const container = document.getElementById('products');
+      container.innerHTML = '';
+      if(!list.length){
+        container.innerHTML = '<p class="small">Nessun prodotto corrispondente.</p>';
+        return;
+      }
+      list.forEach(p => {
+        const el = document.createElement('article');
+        el.className = 'card';
+        el.innerHTML = `
+          <div class="thumb" aria-hidden="true"><img src="${p.image}" alt="${p.name}"></div>
+          <div>
+            <div class="title">${p.name}</div>
+            <div class="specs">${p.desc}</div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+            <div>
+              <div class="price">${fmt(p.price)}</div>
+              <div class="small" style="margin-top:6px">${p.tags.join(' · ')}</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <button class="btn" data-id="${p.id}" aria-label="Aggiungi ${p.name}">Aggiungi</button>
+              <button class="btn" style="background:transparent;border:1px solid #e7e9ef" data-detail="${p.id}">Dettagli</button>
+            </div>
+          </div>
+        `;
+        container.appendChild(el);
+      });
+    }
+
+    // Filtro & ricerca
+    function filterAndSort(){
+      const q = document.getElementById('search').value.trim().toLowerCase();
+      const cat = document.getElementById('category').value;
+      const sort = document.getElementById('sort').value;
+      let filtered = products.filter(p => {
+        const matchesQ = !q || (p.name + ' ' + p.desc + ' ' + p.tags.join(' ')).toLowerCase().includes(q);
+        const matchesCat = cat === 'all' || p.category === cat;
+        return matchesQ && matchesCat;
+      });
+      if(sort === 'price-asc') filtered.sort((a,b)=>a.price-b.price);
+      if(sort === 'price-desc') filtered.sort((a,b)=>b.price-a.price);
+      renderProducts(filtered);
+    }
+
+    // Carrello: aggiungi
+    function addToCart(id, qty=1){
+      const prod = products.find(p => p.id === id);
+      if(!prod) return;
+      if(cart[id]) cart[id].qty += qty;
+      else cart[id] = {...prod, qty};
+      updateCartUI();
+    }
+
+    // Rimuovi
+    function removeFromCart(id){
+      delete cart[id];
+      updateCartUI();
+    }
+
+    // Aggiorna quantità
+    function updateQty(id, qty){
+      if(qty <= 0) removeFromCart(id);
+      else { cart[id].qty = qty; updateCartUI(); }
+    }
+
+    // Render carrello
+    function updateCartUI(){
+      const itemsDiv = document.getElementById('cartItems');
+      itemsDiv.innerHTML = '';
+      let total = 0, count = 0;
+      Object.values(cart).forEach(item => {
+        total += item.price * item.qty;
+        count += item.qty;
+        const div = document.createElement('div');
+        div.className = 'cart-item';
+        div.innerHTML = `
+          <img src="${item.image}" alt="${item.name}" style="width:64px;height:48px;object-fit:cover;border-radius:6px">
+          <div style="flex:1">
+            <div style="font-weight:600">${item.name}</div>
+            <div class="small">${fmt(item.price)} · ${item.desc}</div>
+            <div class="qty" style="margin-top:8px">
+              <button data-dec="${item.id}" aria-label="Riduci quantità">-</button>
+              <input type="number" min="1" value="${item.qty}" data-input="${item.id}" style="width:56px;padding:6px;border-radius:6px;border:1px solid #e7e9ef">
+              <button data-inc="${item.id}" aria-label="Aumenta quantità">+</button>
+            </div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-weight:700">${fmt(item.price * item.qty)}</div>
+            <div class="actions small" style="margin-top:8px">
+              <button data-remove="${item.id}">Rimuovi</button>
+            </div>
+          </div>
+        `;
+        itemsDiv.appendChild(div);
+      });
+      document.getElementById('cartTotal').textContent = fmt(total);
+      document.getElementById('cartCount').textContent = count;
+      // attach events in cart
+      itemsDiv.querySelectorAll('[data-dec]').forEach(btn => btn.addEventListener('click', e => {
+        const id = e.currentTarget.getAttribute('data-dec');
+        updateQty(id, (cart[id].qty || 1) - 1);
+      }));
+      itemsDiv.querySelectorAll('[data-inc]').forEach(btn => btn.addEventListener('click', e => {
+        const id = e.currentTarget.getAttribute('data-inc');
+        updateQty(id, (cart[id].qty || 0) + 1);
+      }));
+      itemsDiv.querySelectorAll('[data-input]').forEach(inp => inp.addEventListener('change', e => {
+        const id = e.currentTarget.getAttribute('data-input');
+        const v = parseInt(e.currentTarget.value) || 1;
+        updateQty(id, Math.max(1,v));
+      }));
+      itemsDiv.querySelectorAll('[data-remove]').forEach(btn => btn.addEventListener('click', e => {
+        removeFromCart(e.currentTarget.getAttribute('data-remove'));
+      }));
+    }
+
+    // Modal semplice per dettagli prodotto (alert fallback per demo)
+    function showDetails(id){
+      const p = products.find(x=>x.id===id);
+      if(!p) return;
+      const content = `${p.name}\n\n${p.desc}\nPrezzo: ${fmt(p.price)}\nCategorie: ${p.category}\nTag: ${p.tags.join(', ')}`;
+      alert(content);
+    }
+
+    // Event listeners
+    document.addEventListener('click', (e)=>{
+      if(e.target.matches('[data-id]')) addToCart(e.target.getAttribute('data-id'),1);
+      if(e.target.matches('[data-detail]')) showDetails(e.target.getAttribute('data-detail'));
+    });
+
+    document.getElementById('search').addEventListener('input', filterAndSort);
+    document.getElementById('category').addEventListener('change', filterAndSort);
+    document.getElementById('sort').addEventListener('change', filterAndSort);
+
+    // Carrello open/close
+    const cartPanel = document.getElementById('cart');
+    document.getElementById('openCart').addEventListener('click', ()=>{ cartPanel.classList.add('open'); cartPanel.setAttribute('aria-hidden','false')});
+    document.getElementById('closeCart').addEventListener('click', ()=>{ cartPanel.classList.remove('open'); cartPanel.setAttribute('aria-hidden','true')});
+    // checkout demo
+    document.getElementById('checkout').addEventListener('click', ()=> {
+      if(Object.keys(cart).length === 0) return alert('Il carrello è vuoto.');
+      // In produzione: invia ordine al server, integra gateway
+      alert('Checkout demo: invia i dati al server per processare il pagamento.');
+    });
+
+    // Inizializza
+    renderProducts(products);
+    updateCartUI();
+  </script>
+
+  <!-- JSON-LD per SEO (esempio organization + product snippets) -->
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"Store",
+    "name":"GameRig",
+    "url":"https://example.com",
+    "description":"Vendita di computer da gaming assemblati e prebuilt.",
+    "logo":"https://via.placeholder.com/200x60?text=GameRig",
+    "telephone":"+39-012-3456789",
+    "sameAs":[]
+  }
+  </script>
 </body>
 </html>
